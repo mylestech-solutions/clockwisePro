@@ -1,0 +1,3624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClockWise Pro - Interactive Prototype</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        /* iPhone 16 Pro Max Container */
+        .prototype-container {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .iphone-frame {
+            width: 450px;
+            height: 920px;
+            background: #1a1a1a;
+            border-radius: 50px;
+            padding: 10px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+        
+        .iphone-screen {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Dynamic Island */
+        .dynamic-island {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 35px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 100;
+        }
+        
+        /* Screen Container */
+        .screen {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            flex-direction: column;
+            background: #f5f7fa;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .screen.active {
+            display: flex;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            height: 55px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            padding-top: 40px;
+            position: relative;
+            z-index: 99;
+        }
+        
+        .time {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .status-icons {
+            display: flex;
+            gap: 5px;
+            font-size: 14px;
+        }
+        
+        /* Navigation Bar */
+        .nav-bar {
+            background: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .nav-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-btn:active {
+            transform: scale(0.9);
+        }
+        
+        /* Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            background: #fff;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            padding-bottom: 25px;
+        }
+        
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: none;
+            border: none;
+            padding: 5px 15px;
+        }
+        
+        .bottom-nav-item.active {
+            color: #0891b2;
+        }
+        
+        .bottom-nav-item:active {
+            transform: scale(0.95);
+        }
+        
+        .bottom-nav-icon {
+            font-size: 24px;
+        }
+        
+        .bottom-nav-label {
+            font-size: 11px;
+        }
+        
+        /* Cards */
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .card:active {
+            transform: scale(0.98);
+        }
+        
+        .card.no-click {
+            cursor: default;
+        }
+        
+        .card.no-click:active {
+            transform: none;
+        }
+        
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #0891b2, #0e7490);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #1a1a1a;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .btn-outline {
+            background: none;
+            border: 2px solid #0891b2;
+            color: #0891b2;
+        }
+        
+        .btn-small {
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+        
+        /* Forms */
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        .input:focus {
+            outline: none;
+            border-color: #0891b2;
+            box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+        }
+        
+        .select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        /* Role Selector */
+        .role-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .role-card {
+            padding: 20px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .role-card.selected {
+            border-color: #0891b2;
+            background: #e0f7fa;
+        }
+        
+        .role-card:active {
+            transform: scale(0.95);
+        }
+        
+        .role-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .role-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .role-desc {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        /* Shift Card */
+        .shift-card {
+            background: linear-gradient(135deg, #0891b2, #0e7490);
+            color: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shift-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+        
+        .shift-time {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .shift-location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .shift-progress {
+            background: rgba(255, 255, 255, 0.3);
+            height: 6px;
+            border-radius: 3px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        
+        .shift-progress-bar {
+            background: white;
+            height: 100%;
+            width: 35%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Clock In Button */
+        .clock-btn-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .clock-btn {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .clock-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .clock-btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .clock-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .clock-btn-icon {
+            font-size: 48px;
+        }
+        
+        .clock-btn-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0891b2;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+        
+        /* Live Map */
+        .map-container {
+            height: 300px;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .map-marker {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #0891b2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* MFA Steps */
+        .mfa-container {
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .mfa-step {
+            margin-bottom: 20px;
+        }
+        
+        .mfa-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .mfa-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .mfa-subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+        
+        /* PIN Input */
+        .pin-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .pin-digit {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 24px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .pin-digit:focus {
+            border-color: #0891b2;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+        }
+        
+        /* Camera Preview */
+        .camera-preview {
+            width: 250px;
+            height: 250px;
+            border-radius: 125px;
+            background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .camera-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 220px;
+            height: 220px;
+            border: 3px dashed #0891b2;
+            border-radius: 110px;
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        /* Offline Banner */
+        .offline-banner {
+            background: #f59e0b;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        /* Success Animation */
+        .success-container {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        
+        .success-icon {
+            font-size: 96px;
+            color: #10b981;
+            animation: checkmark 0.6s ease-out;
+        }
+        
+        @keyframes checkmark {
+            0% { transform: scale(0) rotate(45deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(-5deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        
+        /* Employee List */
+        .employee-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .employee-item:active {
+            transform: scale(0.98);
+            background: #f3f4f6;
+        }
+        
+        .employee-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #0891b2, #0e7490);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+        
+        .employee-info {
+            flex: 1;
+        }
+        
+        .employee-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .employee-status {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .employee-time {
+            font-size: 14px;
+            color: #0891b2;
+            font-weight: 500;
+        }
+        
+        /* Quick Actions Grid */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .action-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .action-card:active {
+            transform: scale(0.95);
+            border-color: #0891b2;
+        }
+        
+        .action-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .action-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* Language Selector */
+        .language-selector {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            padding: 10px;
+            display: none;
+            z-index: 1000;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .language-selector.active {
+            display: block;
+        }
+        
+        .language-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .language-option:hover {
+            background: #f3f4f6;
+        }
+        
+        /* Flow Navigation */
+        .flow-nav {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            max-width: 350px;
+        }
+        
+        .flow-nav h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+        
+        .flow-btn {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #0891b2, #0e7490);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .flow-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(8, 145, 178, 0.3);
+        }
+        
+        .flow-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Data Table */
+        .data-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .table-header {
+            background: #f3f4f6;
+            padding: 12px 15px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .table-row {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-row:last-child {
+            border-bottom: none;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a1a;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideDown 0.3s ease-out;
+            display: none;
+        }
+        
+        .toast.show {
+            display: block;
+        }
+        
+        .toast.success {
+            background: #10b981;
+        }
+        
+        .toast.error {
+            background: #ef4444;
+        }
+        
+        .toast.warning {
+            background: #f59e0b;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Loading Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+            height: 20px;
+            margin-bottom: 10px;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 5px;
+            background: #e5e7eb;
+            border-radius: 10px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+        
+        .step {
+            position: relative;
+            text-align: center;
+            z-index: 1;
+        }
+        
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: 600;
+            color: #6b7280;
+        }
+        
+        .step.active .step-circle {
+            background: #0891b2;
+            color: white;
+        }
+        
+        .step.completed .step-circle {
+            background: #10b981;
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        /* Alert Banner */
+        .alert-banner {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-banner.error {
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+        
+        .alert-banner.success {
+            background: #dcfce7;
+            border-color: #86efac;
+        }
+    </style>
+</head>
+<body>
+    <div class="prototype-container">
+        <!-- Flow Navigation Menu -->
+        <div class="flow-nav">
+            <h2>🚀 ClockWise Pro Demo</h2>
+            <button class="flow-btn" onclick="showScreen('splash')">Start Demo</button>
+            <button class="flow-btn" onclick="showScreen('employee-home')">👤 Employee Portal</button>
+            <button class="flow-btn" onclick="showScreen('manager-dashboard')">👔 Manager Portal</button>
+            <button class="flow-btn" onclick="showScreen('admin-console')">🏢 Admin/HR Portal</button>
+            <button class="flow-btn" onclick="showScreen('facilities-dashboard')">🔧 Facilities/IT</button>
+            <button class="flow-btn" onclick="showScreen('payroll-dashboard')">💰 Payroll/Finance</button>
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;">
+            <p style="font-size: 14px; color: #6b7280; margin-bottom: 10px;">🇨🇲 Featured Facilities in Yaoundé:</p>
+            <button class="flow-btn" style="background: linear-gradient(135deg, #10b981, #059669);" onclick="selectFacility('dohs')">🏥 Dohs Medical Center</button>
+            <button class="flow-btn" style="background: linear-gradient(135deg, #6366f1, #4f46e5);" onclick="selectFacility('hadassah')">🏥 Hadassah Medical Center</button>
+        </div>
+
+        <!-- iPhone Frame -->
+        <div class="iphone-frame">
+            <div class="iphone-screen">
+                <div class="dynamic-island"></div>
+                
+                <!-- Splash Screen -->
+                <div class="screen active" id="splash">
+                    <div class="content" style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(135deg, #0891b2, #0e7490);">
+                        <div style="font-size: 72px; color: white; margin-bottom: 20px;">⏰</div>
+                        <h1 style="color: white; font-size: 36px; font-weight: 700; margin-bottom: 10px;">ClockWise Pro</h1>
+                        <p style="color: rgba(255,255,255,0.8); font-size: 16px; margin-bottom: 50px;">Enterprise Workforce Management</p>
+                        <button class="btn" style="background: white; color: #0891b2; width: 200px;" onclick="showScreen('tenant-select')">Get Started</button>
+                    </div>
+                </div>
+
+                <!-- Tenant Selection -->
+                <div class="screen" id="tenant-select">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('splash')">←</button>
+                        <div class="nav-title">Select Organization</div>
+                        <button class="nav-btn" onclick="showScreen('register-choice')">➕</button>
+                    </div>
+                    <div class="content">
+                        <div class="input-group">
+                            <input type="search" class="input" placeholder="Search organizations...">
+                        </div>
+                        
+                        <!-- Featured Medical Centers -->
+                        <div style="font-weight: 600; margin-bottom: 15px; color: #0891b2;">🇨🇲 Featured Medical Centers - Yaoundé, Central Region</div>
+                        
+                        <div class="card" onclick="selectFacility('dohs'); showScreen('login')">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🏥</div>
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: 4px;">Dohs Medical Center</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Premium Healthcare Facility</div>
+                                    <div style="font-size: 12px; color: #0891b2;">📍 Yaoundé, Central Region, Cameroon • 1,200+ Staff</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="selectFacility('hadassah'); showScreen('login')">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #6366f1, #4f46e5); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🏥</div>
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: 4px;">Hadassah Medical Center</div>
+                                    <div style="font-size: 14px; color: #6b7280;">World-Class Medical Institution</div>
+                                    <div style="font-size: 12px; color: #6366f1;">📍 Yaoundé, Central Region, Cameroon • 3,500+ Staff</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Other Organizations -->
+                        <div style="font-weight: 600; margin: 20px 0 15px; color: #6b7280;">Other Organizations</div>
+                        
+                        <div class="card" onclick="showScreen('login')">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🏦</div>
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: 4px;">Global Finance Corp</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Banking & Financial Services</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="showScreen('login')">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🏭</div>
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: 4px;">TechManufacturing Inc</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Manufacturing Industry</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center;">
+                            <p style="color: #6b7280; font-size: 14px; margin-bottom: 15px;">Don't see your organization?</p>
+                            <button class="btn" onclick="showScreen('register-choice')">Register New Account</button>
+                            <button class="btn btn-outline" onclick="showScreen('register-organization')">Register New Organization</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registration Choice -->
+                <div class="screen" id="register-choice">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('splash')">←</button>
+                        <div class="nav-title">Choose Registration Type</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div style="text-align: center; margin: 30px 0;">
+                            <h2 style="font-size: 24px; margin-bottom: 10px;">How would you like to register?</h2>
+                            <p style="color: #6b7280;">Select your role to get started</p>
+                        </div>
+                        
+                        <div class="card" onclick="showScreen('register-employee')" style="background: linear-gradient(135deg, #0891b2, #0e7490); color: white;">
+                            <div style="display: flex; align-items: center; gap: 20px;">
+                                <div style="font-size: 48px;">👤</div>
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; margin-bottom: 5px;">Employee</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">Join an existing organization as staff</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="showScreen('register-manager')" style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white;">
+                            <div style="display: flex; align-items: center; gap: 20px;">
+                                <div style="font-size: 48px;">👔</div>
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; margin-bottom: 5px;">Manager</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">Register as a team leader or supervisor</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="showScreen('register-admin')" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
+                            <div style="display: flex; align-items: center; gap: 20px;">
+                                <div style="font-size: 48px;">🏢</div>
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; margin-bottom: 5px;">Admin/HR</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">Setup and manage organization</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="showScreen('register-organization')" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
+                            <div style="display: flex; align-items: center; gap: 20px;">
+                                <div style="font-size: 48px;">🏥</div>
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; margin-bottom: 5px;">New Organization</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">Register your facility or company</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 30px;">
+                            <p style="color: #6b7280; font-size: 14px;">Already have an account?</p>
+                            <button class="btn btn-outline" onclick="showScreen('login')">Sign In</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employee Registration -->
+                <div class="screen" id="register-employee">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('register-choice')">←</button>
+                        <div class="nav-title">Employee Registration</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div class="progress-steps">
+                            <div class="step active">
+                                <div class="step-circle">1</div>
+                                <div class="step-label">Basic Info</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-circle">2</div>
+                                <div class="step-label">Organization</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-circle">3</div>
+                                <div class="step-label">Verification</div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Full Name</label>
+                            <input type="text" class="input" placeholder="Enter your full name">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Email Address</label>
+                            <input type="email" class="input" placeholder="your.email@example.com">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Phone Number</label>
+                            <input type="tel" class="input" placeholder="+237 6XX XXX XXX">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Employee ID (if known)</label>
+                            <input type="text" class="input" placeholder="Optional">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Create Password</label>
+                            <input type="password" class="input" placeholder="Minimum 8 characters">
+                        </div>
+                        
+                        <button class="btn" onclick="showScreen('register-employee-org')">Next: Select Organization</button>
+                    </div>
+                </div>
+
+                <!-- Employee Registration - Organization -->
+                <div class="screen" id="register-employee-org">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('register-employee')">←</button>
+                        <div class="nav-title">Select Organization</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div class="progress-steps">
+                            <div class="step completed">
+                                <div class="step-circle">✓</div>
+                                <div class="step-label">Basic Info</div>
+                            </div>
+                            <div class="step active">
+                                <div class="step-circle">2</div>
+                                <div class="step-label">Organization</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-circle">3</div>
+                                <div class="step-label">Verification</div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Organization Code</label>
+                            <input type="text" class="input" placeholder="Enter 6-digit code">
+                        </div>
+                        
+                        <div style="text-align: center; margin: 20px 0;">
+                            <p style="color: #6b7280;">OR</p>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Search Organization</label>
+                            <input type="search" class="input" placeholder="Type organization name...">
+                        </div>
+                        
+                        <div class="card" onclick="selectOrganization('dohs')">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <input type="radio" name="org" style="width: 20px; height: 20px;">
+                                <div>
+                                    <div style="font-weight: 600;">Dohs Medical Center</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Yaoundé, Central Region, Cameroon</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="selectOrganization('hadassah')">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <input type="radio" name="org" style="width: 20px; height: 20px;">
+                                <div>
+                                    <div style="font-weight: 600;">Hadassah Medical Center</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Yaoundé, Central Region, Cameroon</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn" onclick="showScreen('register-verification')">Next: Verification</button>
+                        
+                        <div style="text-align: center; margin-top: 20px;">
+                            <p style="color: #6b7280; font-size: 14px;">Don't see your organization?</p>
+                            <a style="color: #0891b2; text-decoration: none;">Contact your HR department</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manager Registration -->
+                <div class="screen" id="register-manager">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('register-choice')">←</button>
+                        <div class="nav-title">Manager Registration</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div style="text-align: center; margin: 30px 0;">
+                            <div style="font-size: 48px; margin-bottom: 15px;">👔</div>
+                            <h2 style="font-size: 24px; margin-bottom: 10px;">Manager Account Setup</h2>
+                            <p style="color: #6b7280;">Register as a team leader or supervisor</p>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Full Name</label>
+                            <input type="text" class="input" placeholder="Enter your full name">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Work Email</label>
+                            <input type="email" class="input" placeholder="manager@hospital.cm">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Department</label>
+                            <select class="select">
+                                <option>Select Department</option>
+                                <option>Emergency Medicine / Urgences</option>
+                                <option>Surgery / Chirurgie</option>
+                                <option>Pediatrics / Pédiatrie</option>
+                                <option>Cardiology / Cardiologie</option>
+                                <option>Maternity / Maternité</option>
+                                <option>General Medicine / Médecine Générale</option>
+                                <option>Laboratory / Laboratoire</option>
+                                <option>Pharmacy / Pharmacie</option>
+                                <option>Nursing / Soins Infirmiers</option>
+                                <option>Administration</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Team Size</label>
+                            <select class="select">
+                                <option>5-10 employees</option>
+                                <option>11-25 employees</option>
+                                <option>26-50 employees</option>
+                                <option>50+ employees</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Manager ID</label>
+                            <input type="text" class="input" placeholder="Enter your manager ID">
+                        </div>
+                        
+                        <button class="btn" onclick="showScreen('register-verification')">Continue to Verification</button>
+                        
+                        <div style="background: #e0f7fa; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 20px;">💡</span>
+                                <div style="font-size: 14px; color: #0e7490;">
+                                    Manager accounts require approval from HR/Admin before activation
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Registration -->
+                <div class="screen" id="register-admin">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('register-choice')">←</button>
+                        <div class="nav-title">Admin/HR Registration</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div style="text-align: center; margin: 30px 0;">
+                            <div style="font-size: 48px; margin-bottom: 15px;">🏢</div>
+                            <h2 style="font-size: 24px; margin-bottom: 10px;">Admin Account Setup</h2>
+                            <p style="color: #6b7280;">Full access to manage your organization</p>
+                        </div>
+                        
+                        <div class="tabs">
+                            <button class="tab active" onclick="switchTab('personal')">Personal Info</button>
+                            <button class="tab" onclick="switchTab('organization')">Organization</button>
+                        </div>
+                        
+                        <div id="personal-tab">
+                            <div class="input-group">
+                                <label class="input-label">Full Name</label>
+                                <input type="text" class="input" placeholder="Enter your full name">
+                            </div>
+                            
+                            <div class="input-group">
+                                <label class="input-label">Job Title</label>
+                                <input type="text" class="input" placeholder="e.g., HR Director, Admin Manager">
+                            </div>
+                            
+                            <div class="input-group">
+                                <label class="input-label">Work Email</label>
+                                <input type="email" class="input" placeholder="admin@hospital.cm">
+                            </div>
+                            
+                            <div class="input-group">
+                                <label class="input-label">Phone Number</label>
+                                <input type="tel" class="input" placeholder="+237 6XX XXX XXX">
+                            </div>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="terms">
+                            <label for="terms">I have authorization to manage this organization</label>
+                        </div>
+                        
+                        <button class="btn" onclick="showScreen('register-organization')">Next: Organization Setup</button>
+                        
+                        <div class="alert-banner">
+                            <span>🔒</span>
+                            <span style="font-size: 14px;">Admin accounts have full access to employee data, payroll, and system settings</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Organization Registration -->
+                <div class="screen" id="register-organization">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('register-admin')">←</button>
+                        <div class="nav-title">Organization Setup</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div style="text-align: center; margin: 20px 0;">
+                            <h2 style="font-size: 24px; margin-bottom: 10px;">Register Your Organization</h2>
+                            <p style="color: #6b7280;">Set up ClockWise Pro for your facility</p>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Organization Name</label>
+                            <input type="text" class="input" placeholder="e.g., Centre Médical de Yaoundé">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Industry</label>
+                            <select class="select">
+                                <option>Healthcare</option>
+                                <option>Banking & Finance</option>
+                                <option>Manufacturing</option>
+                                <option>Retail</option>
+                                <option>Education</option>
+                                <option>Government</option>
+                                <option>Technology</option>
+                                <option>Hospitality</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Number of Employees</label>
+                            <select class="select">
+                                <option>1-50</option>
+                                <option>51-200</option>
+                                <option>201-500</option>
+                                <option>501-1000</option>
+                                <option>1000+</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Primary Location</label>
+                            <input type="text" class="input" placeholder="City, Country" value="Yaoundé, Cameroon">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Time Zone</label>
+                            <select class="select">
+                                <option selected>UTC+1:00 (Yaoundé, Cameroon)</option>
+                                <option>UTC+6:00 (Dhaka)</option>
+                                <option>UTC+2:00 (Jerusalem)</option>
+                                <option>UTC-5:00 (Eastern)</option>
+                                <option>UTC-8:00 (Pacific)</option>
+                                <option>UTC+0:00 (London)</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin: 20px 0;">
+                            <label class="input-label">Required Features</label>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="geo" checked>
+                                <label for="geo">Geofencing & Location Tracking</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="face" checked>
+                                <label for="face">Face Recognition</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="ai" checked>
+                                <label for="ai">AI Predictive Analytics</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="multi" checked>
+                                <label for="multi">Multi-language Support</label>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-success" onclick="showScreen('register-success')">Complete Registration</button>
+                    </div>
+                </div>
+
+                <!-- Registration Verification -->
+                <div class="screen" id="register-verification">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('register-employee-org')">←</button>
+                        <div class="nav-title">Verify Your Account</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div class="mfa-container">
+                            <div class="mfa-icon">📧</div>
+                            <h2 class="mfa-title">Check Your Email</h2>
+                            <p class="mfa-subtitle">We've sent a verification code to your email address</p>
+                            
+                            <div class="pin-container">
+                                <input type="text" class="pin-digit" maxlength="1">
+                                <input type="text" class="pin-digit" maxlength="1">
+                                <input type="text" class="pin-digit" maxlength="1">
+                                <input type="text" class="pin-digit" maxlength="1">
+                                <input type="text" class="pin-digit" maxlength="1">
+                                <input type="text" class="pin-digit" maxlength="1">
+                            </div>
+                            
+                            <button class="btn" onclick="showScreen('register-success')">Verify Account</button>
+                            
+                            <div style="text-align: center; margin-top: 20px;">
+                                <p style="color: #6b7280; font-size: 14px;">Didn't receive the code?</p>
+                                <a style="color: #0891b2; text-decoration: none;" onclick="showToast('Verification code resent!', 'success')">Resend Code</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registration Success -->
+                <div class="screen" id="register-success">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="content" style="background: white;">
+                        <div class="success-container">
+                            <div class="success-icon">🎉</div>
+                            <h2 style="font-size: 28px; margin: 20px 0;">Registration Complete!</h2>
+                            <p style="color: #6b7280; margin-bottom: 30px;">Your account has been created successfully</p>
+                            
+                            <div class="card no-click" style="background: #e0f7fa; border: 1px solid #0891b2;">
+                                <div style="text-align: left;">
+                                    <div style="font-weight: 600; margin-bottom: 10px;">Next Steps:</div>
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                        <span>✅</span>
+                                        <span style="font-size: 14px;">Account created</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                        <span>⏳</span>
+                                        <span style="font-size: 14px;">Awaiting HR approval (24-48 hours)</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span>📧</span>
+                                        <span style="font-size: 14px;">You'll receive an email once approved</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn" onclick="showScreen('login')">Go to Login</button>
+                            <button class="btn btn-outline" onclick="showScreen('splash')">Back to Home</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Login Screen -->
+                <div class="screen" id="login">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('tenant-select')">←</button>
+                        <div class="nav-title">Sign In</div>
+                        <button class="nav-btn" onclick="showScreen('register-choice')">📝</button>
+                    </div>
+                    <div class="content">
+                        <div style="text-align: center; margin: 40px 0;">
+                            <div id="facility-logo" style="width: 100px; height: 100px; background: linear-gradient(135deg, #0891b2, #0e7490); border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">⏰</div>
+                            <h2 style="font-size: 24px; margin-bottom: 10px;">Welcome Back</h2>
+                            <p id="facility-name" style="color: #6b7280;">Sign in to your organization</p>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Email</label>
+                            <input type="email" class="input" id="login-email" placeholder="Enter your email">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Password</label>
+                            <input type="password" class="input" value="••••••••">
+                        </div>
+                        
+                        <button class="btn" onclick="handleLogin()">Sign In</button>
+                        <button class="btn btn-outline" onclick="showScreen('sso-login')">Sign In with SSO</button>
+                        
+                        <div style="text-align: center; margin-top: 20px;">
+                            <a style="color: #0891b2; text-decoration: none;" onclick="showScreen('forgot-password')">Forgot Password?</a>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 30px;">
+                            <p style="color: #6b7280; font-size: 14px;">Don't have an account?</p>
+                            <a style="color: #0891b2; text-decoration: none;" onclick="showScreen('register-choice')">Register Now</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SSO Login -->
+                <div class="screen" id="sso-login">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('login')">←</button>
+                        <div class="nav-title">SSO Login</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div style="text-align: center; margin: 40px 0;">
+                            <h2 style="font-size: 24px; margin-bottom: 10px;">Single Sign-On</h2>
+                            <p style="color: #6b7280;">Choose your authentication provider</p>
+                        </div>
+                        
+                        <button class="btn" style="background: #4285f4;" onclick="showScreen('mfa-setup')">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <span style="font-size: 20px;">G</span>
+                                <span>Continue with Google</span>
+                            </div>
+                        </button>
+                        
+                        <button class="btn" style="background: #0e76a8;" onclick="showScreen('mfa-setup')">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <span style="font-size: 20px;">in</span>
+                                <span>Continue with LinkedIn</span>
+                            </div>
+                        </button>
+                        
+                        <button class="btn" style="background: #00a4ef;" onclick="showScreen('mfa-setup')">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <span style="font-size: 20px;">M</span>
+                                <span>Continue with Microsoft</span>
+                            </div>
+                        </button>
+                        
+                        <button class="btn btn-secondary" onclick="showScreen('mfa-setup')">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <span style="font-size: 20px;">🏥</span>
+                                <span>Organization SAML</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Forgot Password -->
+                <div class="screen" id="forgot-password">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('login')">←</button>
+                        <div class="nav-title">Reset Password</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div style="text-align: center; margin: 40px 0;">
+                            <div style="font-size: 72px; margin-bottom: 20px;">🔐</div>
+                            <h2 style="font-size: 24px; margin-bottom: 10px;">Forgot Your Password?</h2>
+                            <p style="color: #6b7280;">Enter your email to receive reset instructions</p>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">Email Address</label>
+                            <input type="email" class="input" placeholder="your.email@example.com">
+                        </div>
+                        
+                        <button class="btn" onclick="showToast('Password reset link sent!', 'success'); setTimeout(() => showScreen('login'), 2000)">Send Reset Link</button>
+                        
+                        <div style="text-align: center; margin-top: 30px;">
+                            <p style="color: #6b7280; font-size: 14px;">Remember your password?</p>
+                            <a style="color: #0891b2; text-decoration: none;" onclick="showScreen('login')">Back to Login</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MFA Setup -->
+                <div class="screen" id="mfa-setup">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <div></div>
+                        <div class="nav-title">Security Setup</div>
+                        <button class="nav-btn" onclick="showScreen('permissions')">Skip →</button>
+                    </div>
+                    <div class="content">
+                        <div class="mfa-container">
+                            <div class="mfa-icon">🔐</div>
+                            <h2 class="mfa-title">Enable Multi-Factor Auth</h2>
+                            <p class="mfa-subtitle">Secure your account with GPS, Face ID, and PIN</p>
+                            
+                            <div class="card no-click" style="text-align: left;">
+                                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                                    <div style="font-size: 24px;">📍</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Location Verification</div>
+                                        <div style="font-size: 14px; color: #6b7280;">Clock in only from authorized sites</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                                    <div style="font-size: 24px;">👤</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Face Recognition</div>
+                                        <div style="font-size: 14px; color: #6b7280;">Liveness detection prevents spoofing</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="font-size: 24px;">🔢</div>
+                                    <div>
+                                        <div style="font-weight: 600;">4-Digit PIN</div>
+                                        <div style="font-size: 14px; color: #6b7280;">Quick secure verification</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn" onclick="showScreen('permissions')">Continue Setup</button>
+                            <button class="btn btn-outline" onclick="showScreen('permissions')">Setup Later</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Permissions Screen -->
+                <div class="screen" id="permissions">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <div></div>
+                        <div class="nav-title">App Permissions</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div style="text-align: center; margin: 30px 0;">
+                            <h2 style="font-size: 24px; margin-bottom: 10px;">Enable Permissions</h2>
+                            <p style="color: #6b7280;">ClockWise Pro needs these permissions to work properly</p>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="font-size: 24px;">📍</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Location Services</div>
+                                        <div style="font-size: 14px; color: #6b7280;">For geofenced clock-in</div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-small" onclick="showToast('Location access granted', 'success')">Allow</button>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="font-size: 24px;">📷</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Camera</div>
+                                        <div style="font-size: 14px; color: #6b7280;">For face verification</div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-small" onclick="showToast('Camera access granted', 'success')">Allow</button>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="font-size: 24px;">🏃</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Motion & Fitness</div>
+                                        <div style="font-size: 14px; color: #6b7280;">For idle detection</div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-small" onclick="showToast('Motion access granted', 'success')">Allow</button>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="font-size: 24px;">🔔</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Notifications</div>
+                                        <div style="font-size: 14px; color: #6b7280;">For shift reminders</div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-small" onclick="showToast('Notifications enabled', 'success')">Allow</button>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-success" onclick="showScreen('employee-home')">All Set! Continue</button>
+                    </div>
+                </div>
+
+                <!-- Employee Home -->
+                <div class="screen" id="employee-home">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #0891b2, #0e7490); border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">BK</div>
+                            <div>
+                                <div style="font-size: 14px; color: #6b7280;">Good morning,</div>
+                                <div style="font-weight: 600;">Brine</div>
+                            </div>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="nav-btn" onclick="showScreen('notifications')">🔔</button>
+                            <button class="nav-btn" onclick="toggleLanguage()">🌐</button>
+                        </div>
+                    </div>
+                    
+                    <div class="content">
+                        <div class="shift-card">
+                            <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">TODAY'S SHIFT</div>
+                            <div class="shift-time">9:00 AM - 5:00 PM</div>
+                            <div class="shift-location">
+                                <span>📍</span>
+                                <span id="shift-location">Main Campus</span>
+                            </div>
+                            <div class="shift-progress">
+                                <div class="shift-progress-bar"></div>
+                            </div>
+                            <div style="font-size: 14px; opacity: 0.9;">5h 24m remaining</div>
+                        </div>
+                        
+                        <div class="clock-btn-container">
+                            <button class="clock-btn" onclick="showScreen('mfa-location')">
+                                <div class="clock-btn-icon">👆</div>
+                                <div class="clock-btn-text">CLOCK IN</div>
+                            </button>
+                        </div>
+                        
+                        <div class="quick-actions">
+                            <div class="action-card" onclick="showScreen('schedule')">
+                                <div class="action-icon">📅</div>
+                                <div class="action-label">My Schedule</div>
+                            </div>
+                            <div class="action-card" onclick="showScreen('time-history')">
+                                <div class="action-icon">📊</div>
+                                <div class="action-label">Time History</div>
+                            </div>
+                            <div class="action-card" onclick="showScreen('messages')">
+                                <div class="action-icon">💬</div>
+                                <div class="action-label">Messages</div>
+                            </div>
+                            <div class="action-card" onclick="showScreen('requests')">
+                                <div class="action-icon">📝</div>
+                                <div class="action-label">Requests</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="font-weight: 600; margin-bottom: 15px;">📢 Team Announcements</div>
+                            <div style="padding: 10px; background: #f3f4f6; border-radius: 8px; margin-bottom: 10px;">
+                                <div style="font-weight: 500; margin-bottom: 5px;">Holiday Schedule Posted</div>
+                                <div style="font-size: 14px; color: #6b7280;">Check your upcoming shifts for the holiday period</div>
+                                <div style="font-size: 12px; color: #9ca3af; margin-top: 5px;">2 hours ago</div>
+                            </div>
+                            <div style="padding: 10px; background: #f3f4f6; border-radius: 8px;">
+                                <div style="font-weight: 500; margin-bottom: 5px;">New Safety Protocol</div>
+                                <div style="font-size: 14px; color: #6b7280;">Updated PPE requirements in emergency wing</div>
+                                <div style="font-size: 12px; color: #9ca3af; margin-top: 5px;">Yesterday</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bottom-nav">
+                        <button class="bottom-nav-item active" onclick="showScreen('employee-home')">
+                            <div class="bottom-nav-icon">🏠</div>
+                            <div class="bottom-nav-label">Home</div>
+                        </button>
+                        <button class="bottom-nav-item" onclick="showScreen('schedule')">
+                            <div class="bottom-nav-icon">📅</div>
+                            <div class="bottom-nav-label">Schedule</div>
+                        </button>
+                        <button class="bottom-nav-item" onclick="showScreen('time-history')">
+                            <div class="bottom-nav-icon">⏱️</div>
+                            <div class="bottom-nav-label">History</div>
+                        </button>
+                        <button class="bottom-nav-item" onclick="showScreen('messages')">
+                            <div class="bottom-nav-icon">💬</div>
+                            <div class="bottom-nav-label">Messages</div>
+                        </button>
+                        <button class="bottom-nav-item" onclick="showScreen('profile')">
+                            <div class="bottom-nav-icon">👤</div>
+                            <div class="bottom-nav-label">Profile</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MFA Location Verification -->
+                <div class="screen" id="mfa-location">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('employee-home')">×</button>
+                        <div class="nav-title">Clock In - Step 1/3</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div class="mfa-container">
+                            <div class="mfa-icon">📍</div>
+                            <h2 class="mfa-title">Verifying Location</h2>
+                            <p class="mfa-subtitle" id="location-subtitle">Checking your location...</p>
+                            
+                            <div class="map-container" style="height: 200px; margin: 30px 0;">
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                                    <div style="width: 20px; height: 20px; background: #0891b2; border-radius: 10px; box-shadow: 0 0 0 20px rgba(8, 145, 178, 0.2);"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="card no-click" style="background: #dcfce7; border: 1px solid #86efac;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span style="font-size: 24px;">✅</span>
+                                    <div>
+                                        <div style="font-weight: 600; color: #16a34a;">Location Verified</div>
+                                        <div style="font-size: 14px; color: #15803d;">Within geofence boundary</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn" onclick="showScreen('mfa-face')">Continue</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MFA Face Verification -->
+                <div class="screen" id="mfa-face">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('mfa-location')">←</button>
+                        <div class="nav-title">Clock In - Step 2/3</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div class="mfa-container">
+                            <h2 class="mfa-title">Face Verification</h2>
+                            <p class="mfa-subtitle">Position your face in the circle</p>
+                            
+                            <div class="camera-preview">
+                                <div class="camera-overlay"></div>
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 72px;">👤</div>
+                            </div>
+                            
+                            <div style="margin: 20px 0;">
+                                <div style="text-align: center; color: #6b7280; font-size: 14px;">
+                                    💡 Ensure good lighting and remove glasses
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-success" onclick="showScreen('mfa-pin')">Capture & Verify</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MFA PIN Entry -->
+                <div class="screen" id="mfa-pin">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('mfa-face')">←</button>
+                        <div class="nav-title">Clock In - Step 3/3</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div class="mfa-container">
+                            <h2 class="mfa-title">Enter Your PIN</h2>
+                            <p class="mfa-subtitle">Enter your 4-digit security PIN</p>
+                            
+                            <div class="pin-container">
+                                <input type="text" class="pin-digit" maxlength="1" value="•">
+                                <input type="text" class="pin-digit" maxlength="1" value="•">
+                                <input type="text" class="pin-digit" maxlength="1" value="•">
+                                <input type="text" class="pin-digit" maxlength="1">
+                            </div>
+                            
+                            <div style="text-align: center; margin: 20px 0;">
+                                <a style="color: #0891b2; text-decoration: none; font-size: 14px;" onclick="showToast('PIN reset link sent to your email', 'success')">Forgot PIN?</a>
+                            </div>
+                            
+                            <button class="btn btn-success" onclick="showScreen('clock-success')">Verify & Clock In</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clock In Success -->
+                <div class="screen" id="clock-success">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="content" style="background: white;">
+                        <div class="success-container">
+                            <div class="success-icon">✓</div>
+                            <h2 style="font-size: 28px; margin: 20px 0;">Successfully Clocked In!</h2>
+                            <p style="color: #6b7280; margin-bottom: 20px;">9:00 AM at <span id="success-location">Main Campus</span></p>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-value">9:00</div>
+                                    <div class="stat-label">Clock In</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">8h</div>
+                                    <div class="stat-label">Scheduled</div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn" onclick="showScreen('employee-clocked')">Continue to Dashboard</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employee Clocked In View -->
+                <div class="screen" id="employee-clocked">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 40px; height: 40px; background: #10b981; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white;">⏱️</div>
+                            <div>
+                                <div style="font-size: 14px; color: #6b7280;">Active Session</div>
+                                <div style="font-weight: 600;">0h 15m</div>
+                            </div>
+                        </div>
+                        <div class="nav-buttons">
+                            <button class="nav-btn" onclick="showScreen('notifications')">🔔</button>
+                            <button class="nav-btn" onclick="showScreen('settings')">⚙️</button>
+                        </div>
+                    </div>
+                    
+                    <div class="content">
+                        <div class="card" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 14px; opacity: 0.9;">Session Time</div>
+                                    <div style="font-size: 32px; font-weight: 700;">0:15:23</div>
+                                    <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;">Started at 9:00 AM</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 48px;">✅</div>
+                                    <div style="font-size: 12px; opacity: 0.9;">Active</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div style="font-size: 20px; margin-bottom: 5px;">📍</div>
+                                <div class="stat-value" style="font-size: 18px;">Zone A</div>
+                                <div class="stat-label">Current Location</div>
+                            </div>
+                            <div class="stat-card">
+                                <div style="font-size: 20px; margin-bottom: 5px;">📋</div>
+                                <div class="stat-value" style="font-size: 18px;">3/5</div>
+                                <div class="stat-label">Tasks Complete</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                            <button class="btn btn-secondary" style="flex: 1;" onclick="showScreen('break-start')">Take Break</button>
+                            <button class="btn btn-danger" style="flex: 1;" onclick="showScreen('clock-out-confirm')">Clock Out</button>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="font-weight: 600; margin-bottom: 15px;">Today's Assignments</div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" checked>
+                                    <span>Patient rounds - Ward 3A</span>
+                                </div>
+                                <span style="color: #10b981; font-size: 14px;">✓</span>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" checked>
+                                    <span>Medication distribution</span>
+                                </div>
+                                <span style="color: #10b981; font-size: 14px;">✓</span>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox">
+                                    <span>Equipment check - Room 201</span>
+                                </div>
+                                <span style="color: #6b7280; font-size: 14px;">Pending</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bottom-nav">
+                        <button class="bottom-nav-item active">
+                            <div class="bottom-nav-icon">⏱️</div>
+                            <div class="bottom-nav-label">Session</div>
+                        </button>
+                        <button class="bottom-nav-item" onclick="showScreen('tasks')">
+                            <div class="bottom-nav-icon">📋</div>
+                            <div class="bottom-nav-label">Tasks</div>
+                        </button>
+                        <button class="bottom-nav-item" onclick="showScreen('location-map')">
+                            <div class="bottom-nav-icon">📍</div>
+                            <div class="bottom-nav-label">Location</div>
+                        </button>
+                        <button class="bottom-nav-item" onclick="showScreen('messages')">
+                            <div class="bottom-nav-icon">💬</div>
+                            <div class="bottom-nav-label">Chat</div>
+                        </button>
+                        <button class="bottom-nav-item" onclick="showScreen('alerts')">
+                            <div class="bottom-nav-icon">🔔</div>
+                            <div class="bottom-nav-label">Alerts</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Additional Employee Screens -->
+                
+                <!-- Time History -->
+                <div class="screen" id="time-history">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('employee-home')">←</button>
+                        <div class="nav-title">Time History</div>
+                        <button class="nav-btn" onclick="showScreen('export-timesheet')">📤</button>
+                    </div>
+                    <div class="content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value">42.5h</div>
+                                <div class="stat-label">This Week</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">168h</div>
+                                <div class="stat-label">This Month</div>
+                            </div>
+                        </div>
+                        
+                        <div class="tabs">
+                            <button class="tab active">Daily</button>
+                            <button class="tab">Weekly</button>
+                            <button class="tab">Monthly</button>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div>
+                                    <div style="font-weight: 600;">Today - Nov 14</div>
+                                    <div style="font-size: 14px; color: #6b7280;">9:00 AM - Active</div>
+                                </div>
+                                <div style="color: #10b981; font-weight: 600;">0.25h</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div>
+                                    <div style="font-weight: 600;">Wed - Nov 13</div>
+                                    <div style="font-size: 14px; color: #6b7280;">9:02 AM - 5:18 PM</div>
+                                </div>
+                                <div style="font-weight: 600;">8.27h</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div>
+                                    <div style="font-weight: 600;">Tue - Nov 12</div>
+                                    <div style="font-size: 14px; color: #6b7280;">8:58 AM - 5:05 PM</div>
+                                </div>
+                                <div style="font-weight: 600;">8.12h</div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-outline" onclick="showScreen('detailed-history')">View Detailed History</button>
+                    </div>
+                </div>
+
+                <!-- Requests -->
+                <div class="screen" id="requests">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('employee-home')">←</button>
+                        <div class="nav-title">My Requests</div>
+                        <button class="nav-btn" onclick="showScreen('new-request')">➕</button>
+                    </div>
+                    <div class="content">
+                        <button class="btn" onclick="showScreen('leave-request')">Request Time Off</button>
+                        <button class="btn btn-secondary" onclick="showScreen('shift-swap')">Request Shift Swap</button>
+                        
+                        <div style="font-weight: 600; margin: 20px 0 15px;">Recent Requests</div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600;">Annual Leave</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Dec 24-26, 2024</div>
+                                </div>
+                                <div style="background: #fef3c7; color: #92400e; padding: 5px 10px; border-radius: 6px; font-size: 14px;">Pending</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600;">Shift Swap</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Nov 20 with Jane Doe</div>
+                                </div>
+                                <div style="background: #dcfce7; color: #16a34a; padding: 5px 10px; border-radius: 6px; font-size: 14px;">Approved</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile -->
+                <div class="screen" id="profile">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('employee-home')">←</button>
+                        <div class="nav-title">My Profile</div>
+                        <button class="nav-btn" onclick="showScreen('edit-profile')">✏️</button>
+                    </div>
+                    <div class="content">
+                        <div style="text-align: center; margin: 30px 0;">
+                            <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #0891b2, #0e7490); border-radius: 50px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 36px; font-weight: 600;">BK</div>
+                            <h2 style="font-size: 24px; margin-bottom: 5px;">Brine Ketum</h2>
+                            <p style="color: #6b7280;">Employee ID: EMP-2024-1234</p>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="margin-bottom: 15px;">
+                                <div style="font-size: 14px; color: #6b7280; margin-bottom: 5px;">Department</div>
+                                <div style="font-weight: 600;">Emergency Medicine / Urgences</div>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <div style="font-size: 14px; color: #6b7280; margin-bottom: 5px;">Position</div>
+                                <div style="font-weight: 600;">Registered Nurse</div>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <div style="font-size: 14px; color: #6b7280; margin-bottom: 5px;">Email</div>
+                                <div style="font-weight: 600;">brine.ketum@dohs-medical.cm</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 14px; color: #6b7280; margin-bottom: 5px;">Phone</div>
+                                <div style="font-weight: 600;">+237 670 123 456</div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-outline" onclick="showScreen('settings')">Settings</button>
+                        <button class="btn btn-outline" onclick="showScreen('help')">Help & Support</button>
+                        <button class="btn btn-danger" onclick="showScreen('login')">Sign Out</button>
+                    </div>
+                </div>
+
+                <!-- Manager Dashboard -->
+                <div class="screen" id="manager-dashboard">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <div style="font-weight: 600;">Team Overview</div>
+                        <div class="nav-buttons">
+                            <button class="nav-btn" onclick="showScreen('team-search')">🔍</button>
+                            <button class="nav-btn" onclick="showScreen('manager-calendar')">📅</button>
+                            <button class="nav-btn" onclick="showScreen('manager-menu')">⋮</button>
+                        </div>
+                    </div>
+                    
+                    <div class="content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value">42</div>
+                                <div class="stat-label">Active</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">5</div>
+                                <div class="stat-label">On Break</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">3</div>
+                                <div class="stat-label">Late</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">2</div>
+                                <div class="stat-label">Absent</div>
+                            </div>
+                        </div>
+                        
+                        <div class="map-container">
+                            <div class="map-marker" style="top: 30%; left: 40%;">5</div>
+                            <div class="map-marker" style="top: 60%; left: 60%; background: #f59e0b;">3</div>
+                            <div class="map-marker" style="top: 45%; left: 25%; background: #10b981;">8</div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="font-weight: 600; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                                <span>Team Members</span>
+                                <span style="font-size: 14px; color: #0891b2; cursor: pointer;" onclick="showScreen('team-list')">View All →</span>
+                            </div>
+                            
+                            <div class="employee-item" onclick="showScreen('employee-detail')">
+                                <div class="employee-avatar">BK</div>
+                                <div class="employee-info">
+                                    <div class="employee-name">Brine Ketum</div>
+                                    <div class="employee-status">Zone A - Patient Care</div>
+                                </div>
+                                <div class="employee-time">0:15</div>
+                            </div>
+                            
+                            <div class="employee-item">
+                                <div class="employee-avatar" style="background: #10b981;">JD</div>
+                                <div class="employee-info">
+                                    <div class="employee-name">Jane Doe</div>
+                                    <div class="employee-status">Zone B - Emergency</div>
+                                </div>
+                                <div class="employee-time">2:45</div>
+                            </div>
+                            
+                            <div class="employee-item">
+                                <div class="employee-avatar" style="background: #f59e0b;">MS</div>
+                                <div class="employee-info">
+                                    <div class="employee-name">Mike Smith</div>
+                                    <div class="employee-status">On Break</div>
+                                </div>
+                                <div class="employee-time">3:20</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click" style="background: #fef3c7; border: 1px solid #fcd34d;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 24px;">⚠️</span>
+                                <div>
+                                    <div style="font-weight: 600; color: #92400e;">3 Alerts Require Attention</div>
+                                    <div style="font-size: 14px; color: #78350f;">Overtime risk, late arrival, missing breaks</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bottom-nav">
+                        <button class="bottom-nav-item active">
+                            <div class="bottom-nav-icon">📊</div>
+                            <div class="bottom-nav-label">Dashboard</div>
+                        </button>
+                        <button class="bottom-nav-item" onclick="showScreen('manager-team')">
+                            <div class="bottom-nav-icon">👥</div>
+                            <div class="bottom-nav-label">Team</div>
+                        </button>
+                        <button class="bottom-nav-item" onclick="showScreen('manager-schedule')">
+                            <div class="bottom-nav-icon">📅</div>
+                            <div class="bottom-nav-label">Schedule</div>
+                        </button>
+                        <button class="bottom-nav-item" onclick="showScreen('manager-reports')">
+                            <div class="bottom-nav-icon">📈</div>
+                            <div class="bottom-nav-label">Reports</div>
+                        </button>
+                        <button class="bottom-nav-item" onclick="showScreen('manager-settings')">
+                            <div class="bottom-nav-icon">⚙️</div>
+                            <div class="bottom-nav-label">Settings</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Manager Team -->
+                <div class="screen" id="manager-team">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('manager-dashboard')">←</button>
+                        <div class="nav-title">Team Management</div>
+                        <button class="nav-btn" onclick="showScreen('add-team-member')">➕</button>
+                    </div>
+                    <div class="content">
+                        <div class="input-group">
+                            <input type="search" class="input" placeholder="Search team members...">
+                        </div>
+                        
+                        <div class="tabs">
+                            <button class="tab active">All (52)</button>
+                            <button class="tab">Active (42)</button>
+                            <button class="tab">Off Duty (10)</button>
+                        </div>
+                        
+                        <div class="employee-item">
+                            <div class="employee-avatar">BK</div>
+                            <div class="employee-info">
+                                <div class="employee-name">Brine Ketum</div>
+                                <div class="employee-status">Emergency Dept • RN</div>
+                            </div>
+                            <div style="background: #dcfce7; color: #16a34a; padding: 5px 10px; border-radius: 6px; font-size: 12px;">Active</div>
+                        </div>
+                        
+                        <div class="employee-item">
+                            <div class="employee-avatar" style="background: #6366f1;">SJ</div>
+                            <div class="employee-info">
+                                <div class="employee-name">Sarah Johnson</div>
+                                <div class="employee-status">ICU • Senior Nurse</div>
+                            </div>
+                            <div style="background: #dcfce7; color: #16a34a; padding: 5px 10px; border-radius: 6px; font-size: 12px;">Active</div>
+                        </div>
+                        
+                        <div class="employee-item">
+                            <div class="employee-avatar" style="background: #f59e0b;">DR</div>
+                            <div class="employee-info">
+                                <div class="employee-name">David Rodriguez</div>
+                                <div class="employee-status">Surgery • Technician</div>
+                            </div>
+                            <div style="background: #e5e7eb; color: #6b7280; padding: 5px 10px; border-radius: 6px; font-size: 12px;">Off Duty</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manager Schedule -->
+                <div class="screen" id="manager-schedule">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('manager-dashboard')">←</button>
+                        <div class="nav-title">Schedule Management</div>
+                        <button class="nav-btn" onclick="showScreen('ai-scheduler')">🤖</button>
+                    </div>
+                    <div class="content">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <button style="background: none; border: none; font-size: 20px;">←</button>
+                            <div style="font-weight: 600;">Nov 11-17, 2024</div>
+                            <button style="background: none; border: none; font-size: 20px;">→</button>
+                        </div>
+                        
+                        <button class="btn btn-warning" onclick="showScreen('ai-scheduler')">🤖 AI Schedule Assistant</button>
+                        
+                        <div class="card no-click">
+                            <div style="font-weight: 600; margin-bottom: 15px;">Thursday, Nov 14</div>
+                            <div style="font-size: 14px; margin-bottom: 10px;">
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span>Morning Shift (7AM-3PM)</span>
+                                    <span style="font-weight: 600;">18 staff</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span>Afternoon Shift (3PM-11PM)</span>
+                                    <span style="font-weight: 600;">15 staff</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span>Night Shift (11PM-7AM)</span>
+                                    <span style="font-weight: 600;">12 staff</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-banner">
+                            <span>💡</span>
+                            <span style="font-size: 14px;">AI predicts 20% higher patient volume on Friday. Consider adding 3 more staff.</span>
+                        </div>
+                        
+                        <button class="btn btn-outline" onclick="showScreen('shift-requests')">View Shift Requests (5)</button>
+                    </div>
+                </div>
+
+                <!-- Manager Reports -->
+                <div class="screen" id="manager-reports">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('manager-dashboard')">←</button>
+                        <div class="nav-title">Reports & Analytics</div>
+                        <button class="nav-btn" onclick="showScreen('export-reports')">📤</button>
+                    </div>
+                    <div class="content">
+                        <div class="tabs">
+                            <button class="tab active">Overview</button>
+                            <button class="tab">Attendance</button>
+                            <button class="tab">Performance</button>
+                        </div>
+                        
+                        <div class="card no-click" style="background: linear-gradient(135deg, #0891b2, #0e7490); color: white;">
+                            <div style="font-size: 18px; margin-bottom: 15px;">Weekly Summary</div>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700;">98.2%</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">Attendance Rate</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700;">2,340h</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">Total Hours</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700;">45h</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">Overtime</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700;">3</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">Incidents</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="font-weight: 600; margin-bottom: 15px;">Top Performers</div>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <span style="font-size: 20px;">🏆</span>
+                                <div>
+                                    <div style="font-weight: 500;">Jane Doe</div>
+                                    <div style="font-size: 14px; color: #6b7280;">100% attendance • No incidents</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <span style="font-size: 20px;">🥈</span>
+                                <div>
+                                    <div style="font-weight: 500;">Mike Smith</div>
+                                    <div style="font-size: 14px; color: #6b7280;">98% attendance • High efficiency</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 20px;">🥉</span>
+                                <div>
+                                    <div style="font-weight: 500;">Sarah Johnson</div>
+                                    <div style="font-size: 14px; color: #6b7280;">97% attendance • Team player</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn" onclick="showScreen('detailed-analytics')">View Detailed Analytics</button>
+                    </div>
+                </div>
+
+                <!-- Admin Console -->
+                <div class="screen" id="admin-console">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <div style="font-weight: 600;">Admin Console</div>
+                        <div class="nav-buttons">
+                            <button class="nav-btn" onclick="showScreen('admin-notifications')">🔔</button>
+                            <button class="nav-btn" onclick="showScreen('admin-settings')">⚙️</button>
+                        </div>
+                    </div>
+                    
+                    <div class="content">
+                        <div class="card no-click" style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white;">
+                            <div style="font-size: 20px; font-weight: 600; margin-bottom: 15px;" id="org-title">MedTech Healthcare</div>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700;">523</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">Total Employees</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700;">12</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">Active Sites</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700;">98.5%</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">Compliance Score</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700;">18,420</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">Monthly Hours</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="quick-actions">
+                            <div class="action-card" onclick="showScreen('admin-users')">
+                                <div class="action-icon">👥</div>
+                                <div class="action-label">Users & Roles</div>
+                            </div>
+                            <div class="action-card" onclick="showScreen('admin-sites')">
+                                <div class="action-icon">📍</div>
+                                <div class="action-label">Sites & Geofences</div>
+                            </div>
+                            <div class="action-card" onclick="showScreen('admin-payroll')">
+                                <div class="action-icon">💰</div>
+                                <div class="action-label">Payroll Settings</div>
+                            </div>
+                            <div class="action-card" onclick="showScreen('admin-ai')">
+                                <div class="action-icon">🤖</div>
+                                <div class="action-label">AI Settings</div>
+                            </div>
+                            <div class="action-card" onclick="showScreen('admin-audit')">
+                                <div class="action-icon">🔒</div>
+                                <div class="action-label">Audit Logs</div>
+                            </div>
+                            <div class="action-card" onclick="showScreen('admin-export')">
+                                <div class="action-icon">📊</div>
+                                <div class="action-label">Reports</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="font-weight: 600; margin-bottom: 15px;">Recent Activity</div>
+                            <div style="font-size: 14px; padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>New user added: Sarah Johnson</span>
+                                    <span style="color: #6b7280;">5m ago</span>
+                                </div>
+                            </div>
+                            <div style="font-size: 14px; padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Geofence updated: Building C</span>
+                                    <span style="color: #6b7280;">1h ago</span>
+                                </div>
+                            </div>
+                            <div style="font-size: 14px; padding: 10px 0;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Payroll export completed</span>
+                                    <span style="color: #6b7280;">3h ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Users -->
+                <div class="screen" id="admin-users">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('admin-console')">←</button>
+                        <div class="nav-title">User Management</div>
+                        <button class="nav-btn" onclick="showScreen('add-user')">➕</button>
+                    </div>
+                    <div class="content">
+                        <div class="input-group">
+                            <input type="search" class="input" placeholder="Search users...">
+                        </div>
+                        
+                        <div class="tabs">
+                            <button class="tab active">All Users</button>
+                            <button class="tab">Managers</button>
+                            <button class="tab">Employees</button>
+                            <button class="tab">Inactive</button>
+                        </div>
+                        
+                        <div class="data-table">
+                            <div class="table-header">EMPLOYEES (523)</div>
+                            <div class="table-row" onclick="showScreen('user-detail')">
+                                <div>
+                                    <div style="font-weight: 600;">Brine Ketum</div>
+                                    <div style="font-size: 12px; color: #6b7280;">Employee • Emergency</div>
+                                </div>
+                                <span style="color: #10b981;">Active</span>
+                            </div>
+                            <div class="table-row">
+                                <div>
+                                    <div style="font-weight: 600;">Jane Doe</div>
+                                    <div style="font-size: 12px; color: #6b7280;">Manager • ICU</div>
+                                </div>
+                                <span style="color: #10b981;">Active</span>
+                            </div>
+                            <div class="table-row">
+                                <div>
+                                    <div style="font-weight: 600;">Admin User</div>
+                                    <div style="font-size: 12px; color: #6b7280;">Admin • HR</div>
+                                </div>
+                                <span style="color: #10b981;">Active</span>
+                            </div>
+                        </div>
+                        
+                        <button class="btn" onclick="showScreen('bulk-import')">Bulk Import Users</button>
+                    </div>
+                </div>
+
+                <!-- Admin Sites -->
+                <div class="screen" id="admin-sites">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('admin-console')">←</button>
+                        <div class="nav-title">Sites & Geofences</div>
+                        <button class="nav-btn" onclick="showScreen('add-site')">➕</button>
+                    </div>
+                    <div class="content">
+                        <div class="map-container" style="height: 200px;">
+                            <div style="position: absolute; top: 30%; left: 35%; width: 80px; height: 80px; border: 2px solid #0891b2; border-radius: 50%; background: rgba(8, 145, 178, 0.2);"></div>
+                            <div style="position: absolute; top: 50%; left: 60%; width: 60px; height: 60px; border: 2px solid #10b981; border-radius: 50%; background: rgba(16, 185, 129, 0.2);"></div>
+                        </div>
+                        
+                        <div class="card" onclick="showScreen('edit-geofence')">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600;">Main Hospital</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Radius: 500m • 245 employees</div>
+                                </div>
+                                <span style="color: #0891b2;">Edit →</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="showScreen('edit-geofence')">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600;">Emergency Wing</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Polygon • 89 employees</div>
+                                </div>
+                                <span style="color: #0891b2;">Edit →</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="showScreen('edit-geofence')">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600;">Outpatient Clinic</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Radius: 300m • 67 employees</div>
+                                </div>
+                                <span style="color: #0891b2;">Edit →</span>
+                            </div>
+                        </div>
+                        
+                        <button class="btn" onclick="showScreen('add-site')">Add New Site</button>
+                    </div>
+                </div>
+
+                <!-- Admin AI Settings -->
+                <div class="screen" id="admin-ai">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('admin-console')">←</button>
+                        <div class="nav-title">AI Configuration</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div class="card no-click" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white;">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="font-size: 48px;">🤖</div>
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600;">AI Assistant Active</div>
+                                    <div style="font-size: 14px; opacity: 0.9;">Processing 1,247 data points daily</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="font-weight: 600; margin: 20px 0 15px;">AI Features</div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600;">Predictive Staffing</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Forecast staff needs</div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600;">Anomaly Detection</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Detect unusual patterns</div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600;">Fatigue Monitoring</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Track employee wellness</div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600;">Smart Scheduling</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Optimize shift assignments</div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button class="btn" onclick="showScreen('ai-insights')">View AI Insights</button>
+                    </div>
+                </div>
+
+                <!-- Facilities Dashboard -->
+                <div class="screen" id="facilities-dashboard">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <div style="font-weight: 600;">Facilities & IT</div>
+                        <div class="nav-buttons">
+                            <button class="nav-btn" onclick="showScreen('facility-settings')">🔧</button>
+                        </div>
+                    </div>
+                    
+                    <div class="content">
+                        <div class="card no-click">
+                            <div style="font-weight: 600; margin-bottom: 15px;">Network Configuration</div>
+                            <div class="data-table">
+                                <div class="table-header">Approved SSIDs</div>
+                                <div class="table-row">
+                                    <span id="facility-ssid-1">Hospital-Secure</span>
+                                    <span style="color: #10b981;">Active</span>
+                                </div>
+                                <div class="table-row">
+                                    <span id="facility-ssid-2">Hospital-Guest</span>
+                                    <span style="color: #10b981;">Active</span>
+                                </div>
+                                <div class="table-row">
+                                    <span id="facility-ssid-3">Hospital-IoT</span>
+                                    <span style="color: #f59e0b;">Limited</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="font-weight: 600; margin-bottom: 15px;">Beacon Status</div>
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-value">48</div>
+                                    <div class="stat-label">Active Beacons</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">2</div>
+                                    <div class="stat-label">Need Battery</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="font-weight: 600; margin-bottom: 15px;">Device Management</div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                                <span>Registered Devices</span>
+                                <span style="font-weight: 600;">1,247</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                                <span>Active Today</span>
+                                <span style="font-weight: 600;">523</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                                <span>Pending Approval</span>
+                                <span style="font-weight: 600; color: #f59e0b;">8</span>
+                            </div>
+                        </div>
+                        
+                        <button class="btn" onclick="showScreen('network-config')">Configure Networks</button>
+                        <button class="btn btn-secondary" onclick="showScreen('device-logs')">View Device Logs</button>
+                    </div>
+                </div>
+
+                <!-- Payroll Dashboard -->
+                <div class="screen" id="payroll-dashboard">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <div style="font-weight: 600;">Payroll & Finance</div>
+                        <div class="nav-buttons">
+                            <button class="nav-btn" onclick="showScreen('payroll-settings')">💰</button>
+                        </div>
+                    </div>
+                    
+                    <div class="content">
+                        <div class="card no-click" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
+                            <div style="font-size: 18px; margin-bottom: 15px;">Current Pay Period</div>
+                            <div style="font-size: 28px; font-weight: 700; margin-bottom: 10px;">295,430,000 FCFA</div>
+                            <div style="font-size: 14px; opacity: 0.9;">Nov 1 - Nov 15, 2024</div>
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.3);">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Regular Hours: 18,420</span>
+                                    <span>250,000,000 FCFA</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                                    <span>Overtime: 1,240</span>
+                                    <span>45,430,000 FCFA</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value">523</div>
+                                <div class="stat-label">Employees</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">98.2%</div>
+                                <div class="stat-label">Processed</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="font-weight: 600; margin-bottom: 15px;">Overtime Forecast</div>
+                            <div style="background: #fef3c7; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>⚠️ 12 employees approaching 40h</span>
+                                    <span style="font-weight: 600; color: #92400e; cursor: pointer;" onclick="showScreen('overtime-details')">Review</span>
+                                </div>
+                            </div>
+                            <div style="font-size: 14px; color: #6b7280;">
+                                Projected overtime for period: 56,000,000 FCFA
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="font-weight: 600; margin-bottom: 15px;">Export Options</div>
+                            <button class="btn btn-secondary" style="margin-bottom: 10px;" onclick="showToast('Exporting to CSV...', 'success')">📄 Export to CSV</button>
+                            <button class="btn btn-secondary" style="margin-bottom: 10px;" onclick="showToast('Exporting to Excel...', 'success')">📊 Export to Excel</button>
+                            <button class="btn btn-secondary" onclick="showToast('Generating PDF report...', 'success')">📑 Generate PDF Report</button>
+                        </div>
+                        
+                        <button class="btn btn-success" onclick="showScreen('process-payroll')">Process Payroll</button>
+                    </div>
+                </div>
+
+                <!-- Additional Screens -->
+                
+                <!-- Schedule Screen -->
+                <div class="screen" id="schedule">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('employee-home')">←</button>
+                        <div class="nav-title">My Schedule</div>
+                        <button class="nav-btn" onclick="showScreen('shift-swap')">🔄</button>
+                    </div>
+                    <div class="content">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <button style="background: none; border: none; font-size: 20px;">←</button>
+                            <div style="font-weight: 600;">November 2024</div>
+                            <button style="background: none; border: none; font-size: 20px;">→</button>
+                        </div>
+                        
+                        <div class="card">
+                            <div style="font-weight: 600; margin-bottom: 10px;">Today - Thursday, Nov 14</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600; color: #0891b2;">9:00 AM - 5:00 PM</div>
+                                    <div style="font-size: 14px; color: #6b7280;" id="schedule-location">Main Campus</div>
+                                </div>
+                                <div style="background: #dcfce7; color: #16a34a; padding: 5px 10px; border-radius: 6px; font-size: 14px;">Active</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div style="font-weight: 600; margin-bottom: 10px;">Friday, Nov 15</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600;">9:00 AM - 5:00 PM</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Main Campus</div>
+                                </div>
+                                <div style="background: #e5e7eb; color: #6b7280; padding: 5px 10px; border-radius: 6px; font-size: 14px;">Scheduled</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div style="font-weight: 600; margin-bottom: 10px;">Saturday, Nov 16</div>
+                            <div style="text-align: center; padding: 20px; color: #6b7280;">
+                                Day Off
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-outline" onclick="showScreen('request-time-off')">Request Time Off</button>
+                    </div>
+                </div>
+
+                <!-- Messages Screen -->
+                <div class="screen" id="messages">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="goBack()">←</button>
+                        <div class="nav-title">Messages</div>
+                        <button class="nav-btn" onclick="showScreen('new-message')">➕</button>
+                    </div>
+                    <div class="content">
+                        <div class="input-group">
+                            <input type="search" class="input" placeholder="Search messages...">
+                        </div>
+                        
+                        <div class="employee-item" style="background: white;" onclick="showScreen('chat-detail')">
+                            <div class="employee-avatar" style="background: #6366f1;">TM</div>
+                            <div class="employee-info">
+                                <div class="employee-name">Team Manager</div>
+                                <div class="employee-status">Please check your schedule for...</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 12px; color: #6b7280;">2m ago</div>
+                                <div style="background: #ef4444; color: white; width: 20px; height: 20px; border-radius: 10px; font-size: 12px; display: flex; align-items: center; justify-content: center; margin-left: auto; margin-top: 5px;">1</div>
+                            </div>
+                        </div>
+                        
+                        <div class="employee-item" style="background: white;" onclick="showScreen('chat-detail')">
+                            <div class="employee-avatar" style="background: #10b981;">HR</div>
+                            <div class="employee-info">
+                                <div class="employee-name">HR Department</div>
+                                <div class="employee-status">Your leave request has been approved</div>
+                            </div>
+                            <div style="font-size: 12px; color: #6b7280;">1h ago</div>
+                        </div>
+                        
+                        <div class="employee-item" style="background: white;" onclick="showScreen('chat-detail')">
+                            <div class="employee-avatar">JD</div>
+                            <div class="employee-info">
+                                <div class="employee-name">Jane Doe</div>
+                                <div class="employee-status">Can you cover my shift tomorrow?</div>
+                            </div>
+                            <div style="font-size: 12px; color: #6b7280;">3h ago</div>
+                        </div>
+                        
+                        <div class="alert-banner success">
+                            <span>🌐</span>
+                            <span style="font-size: 14px;">Auto-translation enabled for all messages</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Screen -->
+                <div class="screen" id="notifications">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="goBack()">←</button>
+                        <div class="nav-title">Notifications</div>
+                        <button class="nav-btn" onclick="clearNotifications()">Clear</button>
+                    </div>
+                    <div class="content">
+                        <div class="card no-click">
+                            <div style="display: flex; align-items: start; gap: 15px;">
+                                <div style="font-size: 24px;">🎉</div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600;">Welcome to ClockWise Pro!</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Your account is now active</div>
+                                    <div style="font-size: 12px; color: #9ca3af; margin-top: 5px;">Just now</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; align-items: start; gap: 15px;">
+                                <div style="font-size: 24px;">📅</div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600;">Shift Reminder</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Your shift starts in 30 minutes</div>
+                                    <div style="font-size: 12px; color: #9ca3af; margin-top: 5px;">30m ago</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card no-click">
+                            <div style="display: flex; align-items: start; gap: 15px;">
+                                <div style="font-size: 24px;">✅</div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600;">Request Approved</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Your time off request has been approved</div>
+                                    <div style="font-size: 12px; color: #9ca3af; margin-top: 5px;">2h ago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Screen -->
+                <div class="screen" id="settings">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="goBack()">←</button>
+                        <div class="nav-title">Settings</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div class="card no-click">
+                            <div style="font-weight: 600; margin-bottom: 15px;">Preferences</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;">
+                                <span>Dark Mode</span>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;">
+                                <span>Notifications</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;">
+                                <span>Auto Clock-Out</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="showScreen('language-settings')">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600;">Language / Langue</div>
+                                    <div style="font-size: 14px; color: #6b7280;">English (Cameroon)</div>
+                                </div>
+                                <span style="color: #6b7280;">→</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="showScreen('security-settings')">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600;">Security</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Face ID, PIN, 2FA</div>
+                                </div>
+                                <span style="color: #6b7280;">→</span>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-outline" onclick="showScreen('about')">About ClockWise Pro</button>
+                    </div>
+                </div>
+
+                <!-- Language Settings -->
+                <div class="screen" id="language-settings">
+                    <div class="status-bar">
+                        <div class="time">9:41</div>
+                        <div class="status-icons">📶 📶 🔋</div>
+                    </div>
+                    <div class="nav-bar">
+                        <button class="nav-btn" onclick="showScreen('settings')">←</button>
+                        <div class="nav-title">Language Settings</div>
+                        <div></div>
+                    </div>
+                    <div class="content">
+                        <div class="input-group">
+                            <input type="search" class="input" placeholder="Search languages...">
+                        </div>
+                        
+                        <div style="font-weight: 600; margin-bottom: 15px; color: #0891b2;">🇨🇲 Official Languages - Cameroon</div>
+                        
+                        <div class="card" onclick="selectLanguage('en')">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span style="font-size: 24px;">🇬🇧</span>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600;">English</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Official Language</div>
+                                </div>
+                                <input type="radio" name="lang" checked>
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="selectLanguage('fr')">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span style="font-size: 24px;">🇫🇷</span>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600;">Français</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Langue Officielle</div>
+                                </div>
+                                <input type="radio" name="lang">
+                            </div>
+                        </div>
+                        
+                        <div style="font-weight: 600; margin: 20px 0 15px; color: #6b7280;">Other Languages</div>
+                        
+                        <div class="card" onclick="selectLanguage('es')">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span style="font-size: 24px;">🇪🇸</span>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600;">Español</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Spanish</div>
+                                </div>
+                                <input type="radio" name="lang">
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="selectLanguage('ar')">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span style="font-size: 24px;">🇸🇦</span>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600;">العربية</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Arabic (RTL)</div>
+                                </div>
+                                <input type="radio" name="lang">
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="selectLanguage('zh')">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span style="font-size: 24px;">🇨🇳</span>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600;">中文</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Chinese (Simplified)</div>
+                                </div>
+                                <input type="radio" name="lang">
+                            </div>
+                        </div>
+                        
+                        <div class="card" onclick="selectLanguage('hi')">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span style="font-size: 24px;">🇮🇳</span>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600;">हिंदी</div>
+                                    <div style="font-size: 14px; color: #6b7280;">Hindi</div>
+                                </div>
+                                <input type="radio" name="lang">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toast Notification -->
+                <div class="toast" id="toast"></div>
+                
+                <!-- Language Selector Popup -->
+                <div class="language-selector" id="language-selector">
+                    <div class="language-option" onclick="selectLanguage('en')">
+                        <span>🇬🇧</span>
+                        <span>English</span>
+                    </div>
+                    <div class="language-option" onclick="selectLanguage('fr')">
+                        <span>🇫🇷</span>
+                        <span>Français</span>
+                    </div>
+                    <div class="language-option" onclick="selectLanguage('es')">
+                        <span>🇪🇸</span>
+                        <span>Español</span>
+                    </div>
+                    <div class="language-option" onclick="selectLanguage('ar')">
+                        <span>🇸🇦</span>
+                        <span>العربية</span>
+                    </div>
+                    <div class="language-option" onclick="selectLanguage('bn')">
+                        <span>🇧🇩</span>
+                        <span>বাংলা</span>
+                    </div>
+                    <div class="language-option" onclick="selectLanguage('he')">
+                        <span>🇮🇱</span>
+                        <span>עברית</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Additional Styles for new elements */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #0891b2;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+    </style>
+
+    <script>
+        // Global variables
+        let currentScreen = 'splash';
+        let previousScreens = [];
+        let currentFacility = 'default';
+        
+        // Screen Navigation
+        function showScreen(screenId) {
+            // Store previous screen for back navigation
+            const currentScreenElement = document.querySelector('.screen.active');
+            if (currentScreenElement) {
+                previousScreens.push(currentScreenElement.id);
+            }
+            
+            // Hide all screens
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show requested screen
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+                currentScreen = screenId;
+                
+                // Add animation
+                targetScreen.style.animation = 'slideIn 0.3s ease-out';
+                
+                // Show toast for certain actions
+                if (screenId === 'clock-success') {
+                    showToast('Successfully clocked in!', 'success');
+                    celebrate();
+                }
+            }
+        }
+        
+        // Go Back Navigation
+        function goBack() {
+            if (previousScreens.length > 0) {
+                const previousScreen = previousScreens.pop();
+                const screens = document.querySelectorAll('.screen');
+                screens.forEach(screen => {
+                    screen.classList.remove('active');
+                });
+                const targetScreen = document.getElementById(previousScreen);
+                if (targetScreen) {
+                    targetScreen.classList.add('active');
+                    targetScreen.style.animation = 'slideInLeft 0.3s ease-out';
+                    currentScreen = previousScreen;
+                }
+            }
+        }
+        
+        // Handle Login
+        function handleLogin() {
+            const emailInput = document.getElementById('login-email');
+            const email = emailInput ? emailInput.value : '';
+            
+            if (email.includes('manager')) {
+                showScreen('manager-dashboard');
+            } else if (email.includes('admin')) {
+                showScreen('admin-console');
+            } else if (email.includes('facilities')) {
+                showScreen('facilities-dashboard');
+            } else if (email.includes('payroll')) {
+                showScreen('payroll-dashboard');
+            } else {
+                showScreen('mfa-setup');
+            }
+        }
+        
+        // Select Facility
+        function selectFacility(facility) {
+            currentFacility = facility;
+            
+            if (facility === 'dohs') {
+                // Update Dohs Medical Center branding
+                updateBranding('Dohs Medical Center', '#10b981', 'Yaoundé');
+                showToast('Selected: Dohs Medical Center - Yaoundé', 'success');
+            } else if (facility === 'hadassah') {
+                // Update Hadassah Medical Center branding
+                updateBranding('Hadassah Medical Center', '#6366f1', 'Yaoundé');
+                showToast('Selected: Hadassah Medical Center - Yaoundé', 'success');
+            }
+        }
+        
+        // Update Branding
+        function updateBranding(name, color, location) {
+            // Update facility name in various places
+            const facilityName = document.getElementById('facility-name');
+            if (facilityName) facilityName.textContent = `Sign in to ${name}`;
+            
+            const orgTitle = document.getElementById('org-title');
+            if (orgTitle) orgTitle.textContent = name;
+            
+            const shiftLocation = document.getElementById('shift-location');
+            if (shiftLocation) shiftLocation.textContent = `${name} - Yaoundé`;
+            
+            const scheduleLocation = document.getElementById('schedule-location');
+            if (scheduleLocation) scheduleLocation.textContent = `${name} - Yaoundé`;
+            
+            const locationSubtitle = document.getElementById('location-subtitle');
+            if (locationSubtitle) locationSubtitle.textContent = `Checking if you're at ${name}`;
+            
+            const successLocation = document.getElementById('success-location');
+            if (successLocation) successLocation.textContent = name;
+            
+            // Update SSIDs for facility
+            if (facility === 'dohs') {
+                const ssid1 = document.getElementById('facility-ssid-1');
+                if (ssid1) ssid1.textContent = 'Dohs-Secure';
+                const ssid2 = document.getElementById('facility-ssid-2');
+                if (ssid2) ssid2.textContent = 'Dohs-Guest';
+                const ssid3 = document.getElementById('facility-ssid-3');
+                if (ssid3) ssid3.textContent = 'Dohs-IoT';
+            } else if (facility === 'hadassah') {
+                const ssid1 = document.getElementById('facility-ssid-1');
+                if (ssid1) ssid1.textContent = 'Hadassah-Secure';
+                const ssid2 = document.getElementById('facility-ssid-2');
+                if (ssid2) ssid2.textContent = 'Hadassah-Guest';
+                const ssid3 = document.getElementById('facility-ssid-3');
+                if (ssid3) ssid3.textContent = 'Hadassah-Medical';
+            }
+        }
+        
+        // Toast Notification
+        function showToast(message, type = 'default') {
+            const toast = document.getElementById('toast');
+            if (toast) {
+                toast.innerHTML = message;
+                toast.className = 'toast show';
+                if (type) toast.className += ' ' + type;
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+        }
+        
+        // Language Toggle
+        function toggleLanguage() {
+            const selector = document.getElementById('language-selector');
+            if (selector) {
+                selector.classList.toggle('active');
+            }
+        }
+        
+        // Select Language
+        function selectLanguage(lang) {
+            const languages = {
+                'en': 'English selected',
+                'fr': 'Français sélectionné',
+                'es': 'Español seleccionado',
+                'ar': 'تم اختيار العربية',
+                'zh': '已选择中文',
+                'hi': 'हिंदी चुनी गई',
+                'bn': 'বাংলা নির্বাচিত',
+                'he': 'עברית נבחרה'
+            };
+            
+            showToast(`🌐 ${languages[lang] || 'Language selected'}`, 'success');
+            
+            // Hide language selector if open
+            const selector = document.getElementById('language-selector');
+            if (selector) {
+                selector.classList.remove('active');
+            }
+            
+            // Update UI direction for RTL languages
+            if (['ar', 'he'].includes(lang)) {
+                document.querySelector('.iphone-screen').style.direction = 'rtl';
+            } else {
+                document.querySelector('.iphone-screen').style.direction = 'ltr';
+            }
+        }
+        
+        // Select Organization
+        function selectOrganization(org) {
+            const radios = document.querySelectorAll('input[name="org"]');
+            radios.forEach(radio => {
+                radio.checked = false;
+            });
+            event.currentTarget.querySelector('input[type="radio"]').checked = true;
+            
+            if (org === 'dohs') {
+                showToast('Selected: Dohs Medical Center - Yaoundé', 'success');
+            } else if (org === 'hadassah') {
+                showToast('Selected: Hadassah Medical Center - Yaoundé', 'success');
+            }
+        }
+        
+        // Switch Tab
+        function switchTab(tabName) {
+            showToast(`Switched to ${tabName} tab`, 'success');
+        }
+        
+        // Clear Notifications
+        function clearNotifications() {
+            showToast('All notifications cleared', 'success');
+            setTimeout(() => goBack(), 1000);
+        }
+        
+        // Celebration Animation
+        function celebrate() {
+            const body = document.body;
+            body.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            setTimeout(() => {
+                body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            }, 500);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add click feedback to all buttons
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // Visual feedback
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 100);
+                });
+            });
+            
+            // Add click feedback to cards
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                if (!card.classList.contains('no-click')) {
+                    card.style.cursor = 'pointer';
+                }
+            });
+            
+            // Close language selector when clicking outside
+            document.addEventListener('click', (e) => {
+                const selector = document.getElementById('language-selector');
+                const langBtn = e.target.closest('.nav-btn');
+                if (selector && !selector.contains(e.target) && (!langBtn || langBtn.textContent !== '🌐')) {
+                    selector.classList.remove('active');
+                }
+            });
+            
+            // Simulate real-time updates
+            setInterval(() => {
+                const timeElements = document.querySelectorAll('.time');
+                const now = new Date();
+                const time = now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false 
+                }).replace(':', ':');
+                timeElements.forEach(el => {
+                    el.textContent = time;
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
