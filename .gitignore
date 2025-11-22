@@ -1,0 +1,90 @@
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Production
+/build
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Test files (you may want to remove this later)
+test-connection.html
+test-supabase.js
+
+# Large JSON data files
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!public/models/*.json
+
+# Admin/secret env files
+.env.admin
+.env*
+!.env.example
+
+# IDE/Editor history
+.history/
+.claude/
+
+# Database utility scripts
+connect-database.js
+check-actual-tables.js
+scan-all-tables.js
+sql-direct-query.js
+test-connection-from-code.js
+test-login.js
+verify-and-update-config.js
+signout-user.js
+
+# SQL files
+*.sql
+
+# Debug HTML files
+explore-database.html
+view-schema.html
+
+# Markdown documentation (large)
+AUDIT_COMPLETE_SUMMARY.md
+CONNECTION_VERIFIED.md
+IMPLEMENTATION_CHECKLIST.md
+PRODUCTION_IMPLEMENTATION_PLAN.md
+SETUP_COMPLETE.md
+SUPABASE_ACCESS_GUIDE.md
+
+# Old project folder
+clock_wise_pro/

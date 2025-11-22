@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=yes, viewport-fit=cover">
+  <title>Offline - ClockWise Pro</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-center;
+      padding: 20px;
+      color: #fff;
+    }
+
+    .offline-container {
+      text-align: center;
+      max-width: 500px;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .icon {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 30px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+
+    .features {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 25px;
+      margin: 30px 0;
+      text-align: left;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      margin: 15px 0;
+      font-size: 16px;
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-center;
+      margin-right: 15px;
+      font-size: 20px;
+    }
+
+    .retry-btn {
+      background: #fff;
+      color: #667eea;
+      border: none;
+      padding: 15px 40px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .retry-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .retry-btn:active {
+      transform: translateY(0);
+    }
+
+    .status {
+      margin-top: 20px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s linear infinite;
+      margin-left: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 24px;
+      }
+
+      p {
+        font-size: 16px;
+      }
+
+      .icon {
+        width: 80px;
+        height: 80px;
+        font-size: 40px;
+      }
+
+      .offline-container {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="icon">
+      📡
+    </div>
+
+    <h1>You're Offline</h1>
+
+    <p>
+      No internet connection detected. ClockWise Pro works offline with limited features.
+    </p>
+
+    <div class="features">
+      <div class="feature-item">
+        <div class="feature-icon">✓</div>
+        <span>View cached schedules</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">✓</div>
+        <span>Clock in/out (syncs when online)</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">✓</div>
+        <span>View previous pay slips</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">✓</div>
+        <span>Access emergency contacts</span>
+      </div>
+    </div>
+
+    <button class="retry-btn" onclick="retryConnection()">
+      Try Again
+    </button>
+
+    <div class="status" id="status">
+      Waiting for connection...
+    </div>
+  </div>
+
+  <script>
+    // Auto-retry connection every 5 seconds
+    let retryInterval;
+    let isChecking = false;
+
+    function retryConnection() {
+      if (isChecking) return;
+
+      isChecking = true;
+      const statusEl = document.getElementById('status');
+      statusEl.innerHTML = 'Checking connection...<span class="spinner"></span>';
+
+      // Check if online
+      if (navigator.onLine) {
+        // Try to actually fetch something to verify connection
+        fetch('/manifest.json', { method: 'HEAD', cache: 'no-store' })
+          .then(() => {
+            statusEl.textContent = 'Connection restored! Redirecting...';
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          })
+          .catch(() => {
+            statusEl.textContent = 'Still offline. Retrying in 5 seconds...';
+            isChecking = false;
+          });
+      } else {
+        statusEl.textContent = 'Still offline. Retrying in 5 seconds...';
+        isChecking = false;
+      }
+    }
+
+    // Listen for online event
+    window.addEventListener('online', () => {
+      retryConnection();
+    });
+
+    // Auto-retry every 5 seconds
+    retryInterval = setInterval(() => {
+      if (!isChecking) {
+        retryConnection();
+      }
+    }, 5000);
+
+    // Initial check
+    setTimeout(retryConnection, 2000);
+  </script>
+</body>
+</html>
